@@ -15,6 +15,9 @@ import {
 import ProtectedRoute from '../../components/ProtectedRoute';
 import VideoPlayer from '../../components/VideoPlayer';
 import Badge from '../../components/Badge';
+import ZoomableImage from '../../components/ZoomableImage';
+import MenuQuiz from '../../components/MenuQuiz';
+import { MENU_QUIZZES } from '../../data/menuQuizzes';
 import { VESSELS_DATA } from '../../data/biologyData';
 
 function Menu4Content() {
@@ -265,17 +268,11 @@ function Menu4Content() {
               textAlign: 'center'
             }}>
               <div style={{ overflow: 'hidden', borderRadius: '14px', backgroundColor: '#FFFFFF', padding: '10px', border: '1px solid var(--color-border)' }}>
-                <img
+                <ZoomableImage
                   src="/images/struktur-arteri-vena-kapiler.png"
                   alt="Struktur Anatomi Arteri, Vena, dan Kapiler"
-                  style={{
-                    width: '100%',
-                    maxHeight: '340px',
-                    objectFit: 'contain',
-                    borderRadius: '8px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
+                  maxHeight="340px"
+                  caption="Struktur Dinding Arteri vs Vena vs Kapiler"
                 />
               </div>
               <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-dark)', marginTop: '12px', marginBottom: '4px' }}>
@@ -295,17 +292,11 @@ function Menu4Content() {
               textAlign: 'center'
             }}>
               <div style={{ overflow: 'hidden', borderRadius: '14px', backgroundColor: '#FFFFFF', padding: '10px', border: '1px solid var(--color-border)' }}>
-                <img
+                <ZoomableImage
                   src="/images/arteri-vena-lengan.png"
                   alt="Letak Arteri dan Vena pada Lengan Manusia"
-                  style={{
-                    width: '100%',
-                    maxHeight: '340px',
-                    objectFit: 'contain',
-                    borderRadius: '8px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
+                  maxHeight="340px"
+                  caption="Posisi Arteri & Vena pada Ekstremitas Lengan Manusia"
                 />
               </div>
               <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-dark)', marginTop: '12px', marginBottom: '4px' }}>
@@ -344,17 +335,11 @@ function Menu4Content() {
               textAlign: 'center'
             }}>
               <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '10px', border: '1px solid var(--color-border)' }}>
-                <img
+                <ZoomableImage
                   src="/images/peredaran-darah-tertutup.jpg"
                   alt="Bagan Peredaran Darah Tertutup dan Peredaran Darah Besar"
-                  style={{
-                    width: '100%',
-                    maxHeight: '380px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
+                  maxHeight="380px"
+                  caption="Bagan Peredaran Darah Tertutup & Alur Sirkulasi Besar"
                 />
               </div>
               <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-dark)', marginTop: '12px', marginBottom: '4px' }}>
@@ -533,6 +518,13 @@ function Menu4Content() {
             ))}
           </div>
         </div>
+
+        {/* INTERACTIVE MINI QUIZ MENU 4 */}
+        <MenuQuiz
+          menuTitle='Menu 4: "Pipa Tri-Variasi Pembuluh Darah"'
+          menuBadge="Mini Quiz Menu 4"
+          questions={MENU_QUIZZES.menu4}
+        />
 
         {/* Footer Navigation */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>

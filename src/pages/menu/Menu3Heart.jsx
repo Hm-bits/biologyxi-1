@@ -17,6 +17,9 @@ import {
 import ProtectedRoute from '../../components/ProtectedRoute';
 import VideoPlayer from '../../components/VideoPlayer';
 import Badge from '../../components/Badge';
+import ZoomableImage from '../../components/ZoomableImage';
+import MenuQuiz from '../../components/MenuQuiz';
+import { MENU_QUIZZES } from '../../data/menuQuizzes';
 import { HEART_DATA } from '../../data/biologyData';
 
 function Menu3Content() {
@@ -92,20 +95,12 @@ function Menu3Content() {
               textAlign: 'center',
               boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
-                <img
-                  src="/images/anatomi-jantung-lengkap.png"
-                  alt="Anatomi Lengkap Jantung Manusia"
-                  style={{
-                    width: '100%',
-                    maxHeight: '440px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                />
-              </div>
+              <ZoomableImage
+                src="/images/anatomi-jantung-lengkap.png"
+                alt="Anatomi Lengkap Jantung Manusia"
+                maxHeight="440px"
+                caption="Diagram Anatomi Lengkap Organ Jantung & Pembuluh Besar"
+              />
               <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--color-dark)', fontWeight: 700 }}>
                 Anatomi Eksternal & Pembuluh Besar Jantung
               </div>
@@ -588,6 +583,15 @@ function Menu3Content() {
             </div>
           </div>
         </div>
+
+        {/* =========================================================================
+            MINI QUIZ INTERAKTIF 3 SOAL MENU 3
+            ========================================================================= */}
+        <MenuQuiz
+          menuTitle='Menu 3: "Spesial Jantung 4 Ruang"'
+          menuBadge="Mini Quiz Menu 3"
+          questions={MENU_QUIZZES.menu3}
+        />
 
         {/* Footer Navigation */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>

@@ -4,6 +4,9 @@ import { ArrowLeft, ArrowRight, Droplet, Shield, Sparkles, CheckCircle2, Chevron
 import ProtectedRoute from '../../components/ProtectedRoute';
 import VideoPlayer from '../../components/VideoPlayer';
 import Badge from '../../components/Badge';
+import ZoomableImage from '../../components/ZoomableImage';
+import MenuQuiz from '../../components/MenuQuiz';
+import { MENU_QUIZZES } from '../../data/menuQuizzes';
 import { BLOOD_DATA } from '../../data/biologyData';
 
 function Menu2Content() {
@@ -110,20 +113,12 @@ function Menu2Content() {
               textAlign: 'center',
               boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
-                <img
-                  src="/images/sentrifugasi-komponen-darah.png"
-                  alt="Sentrifugasi Komponen Penyusun Darah"
-                  style={{
-                    width: '100%',
-                    maxHeight: '260px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                />
-              </div>
+              <ZoomableImage
+                src="/images/sentrifugasi-komponen-darah.png"
+                alt="Sentrifugasi Komponen Penyusun Darah"
+                maxHeight="260px"
+                caption="Pemisahan Tabung Sentrifus Darah (Plasma 55% & Sel Darah 45%)"
+              />
               <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
                 Pemisahan Tabung Sentrifus Darah
               </div>
@@ -141,20 +136,12 @@ function Menu2Content() {
               textAlign: 'center',
               boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
-                <img
-                  src="/images/lapisan-tabung-darah.png"
-                  alt="3 Lapisan Tabung Darah: Plasma, Sel Putih & Trombosit, Sel Darah Merah"
-                  style={{
-                    width: '100%',
-                    maxHeight: '260px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                />
-              </div>
+              <ZoomableImage
+                src="/images/lapisan-tabung-darah.png"
+                alt="3 Lapisan Tabung Darah: Plasma, Sel Putih & Trombosit, Sel Darah Merah"
+                maxHeight="260px"
+                caption="Stratifikasi 3 Lapisan Tabung Darah (Plasma, Buffy Coat, Sel Merah)"
+              />
               <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
                 Stratifikasi 3 Lapisan Komponen
               </div>
@@ -172,20 +159,12 @@ function Menu2Content() {
               textAlign: 'center',
               boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
-                <img
-                  src="/images/komponen-darah-lengkap.png"
-                  alt="Komponen Darah Mikroskopis dalam Pembuluh"
-                  style={{
-                    width: '100%',
-                    maxHeight: '260px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                />
-              </div>
+              <ZoomableImage
+                src="/images/komponen-darah-lengkap.png"
+                alt="Komponen Darah Mikroskopis dalam Pembuluh"
+                maxHeight="260px"
+                caption="Visualisasi Mikroskopis Komponen Darah dalam Pembuluh Vaskular"
+              />
               <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
                 Visualisasi Mikroskopis Pembuluh Darah
               </div>
@@ -619,6 +598,15 @@ function Menu2Content() {
             </div>
           </div>
         </div>
+
+        {/* =========================================================================
+            MINI QUIZ INTERAKTIF 3 SOAL MENU 2
+            ========================================================================= */}
+        <MenuQuiz
+          menuTitle='Menu 2: "Sup Komponen Darah 2 Fasa"'
+          menuBadge="Mini Quiz Menu 2"
+          questions={MENU_QUIZZES.menu2}
+        />
 
         {/* Footer Navigation */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>

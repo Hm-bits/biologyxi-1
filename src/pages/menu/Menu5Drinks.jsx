@@ -18,6 +18,9 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import VideoPlayer from '../../components/VideoPlayer';
 import BloodFlow from '../../components/BloodFlow';
 import Badge from '../../components/Badge';
+import ZoomableImage from '../../components/ZoomableImage';
+import MenuQuiz from '../../components/MenuQuiz';
+import { MENU_QUIZZES } from '../../data/menuQuizzes';
 
 function Menu5Content() {
   const [activeTab, setActiveTab] = useState('kecil'); // 'kecil' | 'besar'
@@ -106,17 +109,11 @@ function Menu5Content() {
               boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
             }}>
               <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
-                <img
+                <ZoomableImage
                   src="/images/sirkulasi-darah-ganda.jpg"
                   alt="Bagan Sistem Peredaran Darah Kecil dan Besar Manusia"
-                  style={{
-                    width: '100%',
-                    maxHeight: '460px',
-                    objectFit: 'contain',
-                    borderRadius: '10px',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
+                  maxHeight="460px"
+                  caption="Bagan Anatomi Sistem Peredaran Darah Kecil & Besar Manusia"
                 />
               </div>
               <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--color-dark)', fontWeight: 700 }}>
@@ -562,6 +559,13 @@ function Menu5Content() {
             </div>
           </div>
         </div>
+
+        {/* INTERACTIVE MINI QUIZ MENU 5 */}
+        <MenuQuiz
+          menuTitle='Menu 5: "Es Sirkulasi Ganda & Siklus Detak"'
+          menuBadge="Mini Quiz Menu 5"
+          questions={MENU_QUIZZES.menu5}
+        />
 
         {/* 4. KUIS DIAGNOSTIK BANNER */}
         <div style={{
