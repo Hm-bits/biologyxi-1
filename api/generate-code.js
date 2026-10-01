@@ -15,8 +15,8 @@ export default async function handler(req, res) {
 
   const { section = 'all', expiryMinutes = null, devSecret = '' } = req.body || {};
 
-  // DEV SECURITY CHECK: strictly requires secret "dokter12"
-  if (devSecret !== 'dokter12') {
+  // DEV SECURITY CHECK: strictly requires secret "doktxi1"
+  if (devSecret !== 'doktxi1') {
     return res.status(403).json({
       success: false,
       message: 'Akses Ditolak: Hanya akun Developer terverifikasi yang dapat menerbitkan Access Code.'

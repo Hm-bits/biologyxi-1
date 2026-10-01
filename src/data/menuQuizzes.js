@@ -203,3 +203,4 @@ export const MENU_QUIZZES = {
     }
   ]
 };
+
