@@ -52,12 +52,20 @@ function vercelDevApiPlugin() {
   };
 }
 
-function routeApi(pathname, req, res, next) {
-  if (pathname === '/api/verify-code') return verifyHandler(req, res);
-  if (pathname === '/api/validate-session') return validateHandler(req, res);
-  if (pathname === '/api/generate-code') return generateHandler(req, res);
-  if (pathname === '/api/codes') return codesHandler(req, res);
-  if (pathname === '/api/stats') return statsHandler(req, res);
+async function routeApi(pathname, req, res, next) {
+  try {
+    if (pathname === '/api/verify-code') return await verifyHandler(req, res);
+    if (pathname === '/api/validate-session') return await validateHandler(req, res);
+    if (pathname === '/api/generate-code') return await generateHandler(req, res);
+    if (pathname === '/api/codes') return await codesHandler(req, res);
+    if (pathname === '/api/stats') return await statsHandler(req, res);
+  } catch (err) {
+    console.error('API Error in dev server:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+    return;
+  }
   next();
 }
 

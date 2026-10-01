@@ -1,6 +1,6 @@
-import { getStore } from './_store.js';
+import { getStore, normalizeCode } from './_store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -9,12 +9,12 @@ export default function handler(req, res) {
   }
 
   const { search = '', status = 'ALL', section = 'ALL' } = req.query || {};
-  const store = getStore();
-  let list = [...store.codes];
+  const store = await getStore();
+  let list = Array.isArray(store.codes) ? [...store.codes] : [];
 
   if (search) {
-    const q = search.trim().toUpperCase();
-    list = list.filter(item => item.code.toUpperCase().includes(q));
+    const q = normalizeCode(search);
+    list = list.filter(item => normalizeCode(item.code).includes(q));
   }
 
   if (section && section !== 'ALL') {

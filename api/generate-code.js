@@ -1,6 +1,6 @@
-import { getStore, saveStore, generateUUID } from './_store.js';
+import { getStore, saveStore, generateUUID, normalizeCode } from './_store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,7 +19,7 @@ export default function handler(req, res) {
   if (devSecret !== 'dokter12') {
     return res.status(403).json({
       success: false,
-      message: 'Akses Ditolak: Hanya akun Developer terverifikasi (kode: dokter12) yang dapat menerbitkan Access Code.'
+      message: 'Akses Ditolak: Hanya akun Developer terverifikasi yang dapat menerbitkan Access Code.'
     });
   }
 
@@ -27,7 +27,8 @@ export default function handler(req, res) {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   const seg1 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   const seg2 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  const code = `BIO-${seg1}-${seg2}`;
+  const rawCode = `BIO-${seg1}-${seg2}`;
+  const canonicalCode = normalizeCode(rawCode);
 
   const expiresAt = expiryMinutes 
     ? new Date(Date.now() + expiryMinutes * 60 * 1000).toISOString()
@@ -35,7 +36,7 @@ export default function handler(req, res) {
 
   const newCode = {
     id: 'code-' + generateUUID(),
-    code,
+    code: canonicalCode,
     section,
     is_used: false,
     used_at: null,
@@ -44,9 +45,13 @@ export default function handler(req, res) {
     access_type: 'one_time'
   };
 
-  const store = getStore();
-  store.codes.unshift(newCode);
-  saveStore(store);
+  const store = await getStore();
+  // Filter out any potential collision and prepend
+  store.codes = [newCode, ...store.codes.filter(c => normalizeCode(c.code) !== canonicalCode)];
+  await saveStore(store);
+
+  console.log(`[GENERATED CODE] ${newCode.code} | Target: ${newCode.section} | Expiry: ${newCode.expires_at || 'Never'}`);
+  console.log(`[STORED CODE] Total codes in database now: ${store.codes.length}`);
 
   return res.status(201).json(newCode);
 }

@@ -126,7 +126,7 @@ export default function Navbar() {
                   fontWeight: 700,
                   border: `1px solid ${isDev ? '#FECACA' : '#BFDBFE'}`
                 }}>
-                  {isDev ? 'DEV MODE' : 'BUYER MODE'}
+                  {isDev ? 'OPERATOR' : 'SISWA / PEMBELI'}
                 </span>
               </div>
               <p style={{ fontSize: '11px', color: 'var(--color-secondary-text)', margin: 0, fontWeight: 500 }}>

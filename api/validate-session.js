@@ -1,6 +1,6 @@
 import { getStore } from './_store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,17 +19,18 @@ export default function handler(req, res) {
     return res.status(401).json({ valid: false, reason: 'NO_TOKEN' });
   }
 
-  const store = getStore();
-  const session = store.sessions[token];
+  const store = await getStore();
+  const session = store.sessions && store.sessions[token];
 
   if (!session) {
     return res.status(401).json({ valid: false, reason: 'SESSION_NOT_FOUND' });
   }
 
-  if (new Date(session.expires_at) < new Date()) {
+  if (session.expires_at && new Date(session.expires_at) < new Date()) {
     return res.status(401).json({ valid: false, reason: 'SESSION_EXPIRED' });
   }
 
+  // Permission check: 'all' unlocks every menu, otherwise must match exact section
   if (requiredSection && session.section !== 'all' && session.section !== requiredSection) {
     return res.status(403).json({
       valid: false,

@@ -201,41 +201,10 @@ export const sessionManager = {
 };
 
 // =============================================================================
-// Offline Seed Codes
+// Offline Local Cache (No hardcoded demo codes)
 // =============================================================================
 const OFFLINE_CODES_KEY = 'circula_offline_codes';
-const SEED_OFFLINE_CODES = [
-  {
-    id: 'seed-all',
-    code: 'BIO-ALL-2026',
-    section: 'all',
-    is_used: false,
-    used_at: null,
-    created_at: new Date().toISOString(),
-    expires_at: null,
-    access_type: 'one_time'
-  },
-  {
-    id: 'seed-m1',
-    code: 'BIO-MENU1-APP',
-    section: 'menu-1-platter',
-    is_used: false,
-    used_at: null,
-    created_at: new Date().toISOString(),
-    expires_at: null,
-    access_type: 'one_time'
-  },
-  {
-    id: 'seed-m3',
-    code: 'BIO-MENU3-COR',
-    section: 'menu-3-heart',
-    is_used: false,
-    used_at: null,
-    created_at: new Date().toISOString(),
-    expires_at: null,
-    access_type: 'one_time'
-  }
-];
+const SEED_OFFLINE_CODES = [];
 
 function getOfflineCodes() {
   const raw = localStorage.getItem(OFFLINE_CODES_KEY);

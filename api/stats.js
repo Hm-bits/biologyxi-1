@@ -1,6 +1,6 @@
 import { getStore } from './_store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -8,13 +8,15 @@ export default function handler(req, res) {
     return res.status(200).end();
   }
 
-  const store = getStore();
+  const store = await getStore();
+  const codes = Array.isArray(store.codes) ? store.codes : [];
+  const sessions = store.sessions || {};
   const now = new Date();
 
-  const total = store.codes.length;
-  const used = store.codes.filter(c => c.is_used).length;
-  const unused = store.codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length;
-  const activeSessions = Object.values(store.sessions).filter(s => new Date(s.expires_at) > now).length;
+  const total = codes.length;
+  const used = codes.filter(c => c.is_used).length;
+  const unused = codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length;
+  const activeSessions = Object.values(sessions).filter(s => !s.expires_at || new Date(s.expires_at) > now).length;
 
   return res.status(200).json({
     total,

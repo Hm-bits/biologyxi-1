@@ -1,6 +1,6 @@
-import { getStore, saveStore, generateUUID } from './_store.js';
+import { getStore, saveStore, generateUUID, normalizeCode } from './_store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // CORS & method check
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -15,16 +15,19 @@ export default function handler(req, res) {
   }
 
   const { code } = req.body || {};
-  const cleanCode = (code || '').trim().toUpperCase();
+  const cleanCode = normalizeCode(code);
+
+  console.log(`[NORMALIZED INPUT] Code to verify: "${cleanCode}"`);
 
   if (!cleanCode) {
     return res.status(400).json({ success: false, message: 'Harap masukkan Access Code.' });
   }
 
-  const store = getStore();
-  const codeIndex = store.codes.findIndex(c => c.code.toUpperCase() === cleanCode);
+  const store = await getStore();
+  const targetCode = store.codes.find(c => normalizeCode(c.code) === cleanCode);
 
-  if (codeIndex === -1) {
+  if (!targetCode) {
+    console.log(`[VERIFICATION LOOKUP] Code "${cleanCode}" NOT_FOUND in database (${store.codes.length} codes total)`);
     return res.status(404).json({
       success: false,
       error_code: 'NOT_FOUND',
@@ -32,19 +35,21 @@ export default function handler(req, res) {
     });
   }
 
-  const targetCode = store.codes[codeIndex];
+  console.log(`[VERIFICATION LOOKUP] Code "${cleanCode}" FOUND. Target: ${targetCode.section}, Used: ${targetCode.is_used}`);
 
   // 1. One-time check
   if (targetCode.is_used) {
+    console.log(`[USED / UNUSED] Code "${cleanCode}" is ALREADY_USED at ${targetCode.used_at}`);
     return res.status(400).json({
       success: false,
       error_code: 'ALREADY_USED',
-      message: 'Access code ini sudah digunakan oleh pengunjung lain.'
+      message: 'Access Code ini sudah digunakan oleh pengunjung lain.'
     });
   }
 
   // 2. Expiration check
   if (targetCode.expires_at && new Date(targetCode.expires_at) < new Date()) {
+    console.log(`[EXPIRATION] Code "${cleanCode}" EXPIRED at ${targetCode.expires_at}`);
     return res.status(400).json({
       success: false,
       error_code: 'EXPIRED',
@@ -58,17 +63,25 @@ export default function handler(req, res) {
 
   // 4. Create Session
   const sessionToken = 'ses_' + generateUUID();
-  const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+  // Session lasts 24 hours
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+  if (!store.sessions) {
+    store.sessions = {};
+  }
 
   store.sessions[sessionToken] = {
     token: sessionToken,
     code_id: targetCode.id,
+    code: targetCode.code,
     section: targetCode.section,
     created_at: new Date().toISOString(),
     expires_at: expiresAt
   };
 
-  saveStore(store);
+  await saveStore(store);
+
+  console.log(`[REDEMPTION RESULT] Code "${cleanCode}" successfully REDEEMED. Session created: ${sessionToken}`);
 
   return res.status(200).json({
     success: true,

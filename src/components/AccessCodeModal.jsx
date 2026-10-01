@@ -219,7 +219,7 @@ export default function AccessCodeModal({ isOpen, onClose, onSuccess, initialSec
               </div>
             )}
 
-            {/* Hint Box */}
+            {/* Guidance Box */}
             <div style={{
               backgroundColor: '#F8FAFC',
               border: '1px dashed var(--color-border)',
@@ -229,7 +229,7 @@ export default function AccessCodeModal({ isOpen, onClose, onSuccess, initialSec
               fontSize: '12px',
               color: 'var(--color-secondary-text)'
             }}>
-              💡 <strong>Kode Siap Pakai:</strong> Gunakan kode demo <code style={{ background: '#E2E8F0', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, color: 'var(--color-primary)' }}>BIO-ALL-2026</code> (Membuka 5 Bagian) atau buat kode baru di Developer Console.
+              💡 Masukkan Access Code resmi 1x pakai dari Guru / Operator untuk membuka modul materi pembelajaran ini.
             </div>
 
             {/* Actions */}
