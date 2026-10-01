@@ -1,4 +1,4 @@
-import { getStore } from './_store.js';
+import { getStore, verifySignedSession } from './_store.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,6 +19,26 @@ export default async function handler(req, res) {
     return res.status(401).json({ valid: false, reason: 'NO_TOKEN' });
   }
 
+  // 1. First try Cryptographically Signed Session Token (Works across all stateless containers)
+  const cryptoSession = verifySignedSession(token);
+  if (cryptoSession.valid) {
+    // Permission check: 'all' unlocks every menu, otherwise must match exact section
+    if (requiredSection && cryptoSession.section !== 'all' && cryptoSession.section !== requiredSection) {
+      return res.status(403).json({
+        valid: false,
+        reason: 'PERMISSION_DENIED',
+        allowed_section: cryptoSession.section
+      });
+    }
+
+    return res.status(200).json({
+      valid: true,
+      section: cryptoSession.section,
+      expires_at: cryptoSession.expires_at
+    });
+  }
+
+  // 2. Fallback to memory store session lookup
   const store = await getStore();
   const session = store.sessions && store.sessions[token];
 
@@ -30,7 +50,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ valid: false, reason: 'SESSION_EXPIRED' });
   }
 
-  // Permission check: 'all' unlocks every menu, otherwise must match exact section
   if (requiredSection && session.section !== 'all' && session.section !== requiredSection) {
     return res.status(403).json({
       valid: false,

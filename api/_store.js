@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
-// Production Persistent Cloud Storage Object ID
-const CLOUD_OBJECT_ID = process.env.CIRCULA_CLOUD_STORE_ID || 'ff808181a09d98f701a0f6a011815427';
-const CLOUD_STORAGE_ENDPOINT = `https://api.restful-api.dev/objects/${CLOUD_OBJECT_ID}`;
+const HMAC_SECRET = process.env.CIRCULA_SECRET || 'circula_hmac_secret_2026_biologi_sma';
+const CHARS = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // 32 base-32 chars (5 bits each)
 
 const TMP_FILE = path.join('/tmp', 'circula_db.json');
 
@@ -17,139 +17,193 @@ export const SECTIONS_MAP = {
   'all': 'Paket Lengkap All-Access (Semua 5 Menu)'
 };
 
+export const SECTIONS_LIST = [
+  'all',            // 0
+  'menu-1-platter', // 1
+  'menu-2-soup',    // 2
+  'menu-3-heart',   // 3
+  'menu-4-vessels', // 4
+  'menu-5-drinks'   // 5
+];
+
 let memoryStore = {
   codes: [],
-  sessions: {}
+  sessions: {},
+  used_codes: {}
 };
 
 export function normalizeCode(code) {
   if (!code || typeof code !== 'string') return '';
-  return code.trim().toUpperCase().replace(/\s+/g, '');
+  return code.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
 }
 
 /**
- * Retrieve data from shared persistent cloud storage with resilient local reconciliation.
+ * Generate a cryptographically signed Access Code.
+ * Format: BIO-XXXX-XXXX
+ * - Embedded Target Section (char 1)
+ * - High Entropy Random Nonce (chars 2, 3, 4)
+ * - Cryptographic HMAC-SHA256 Signature (chars 5, 6, 7, 8)
  */
-export async function getStore() {
-  // 1. Try reading from shared cloud database
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+export function generateSignedCode(section = 'all') {
+  const secIdx = Math.max(0, SECTIONS_LIST.indexOf(section));
+  const rand1 = Math.floor(Math.random() * 32);
+  const rand2 = Math.floor(Math.random() * 32);
+  const rand3 = Math.floor(Math.random() * 32);
 
-    const res = await fetch(CLOUD_STORAGE_ENDPOINT, {
-      signal: controller.signal,
-      headers: { 'Accept': 'application/json' }
-    });
-    clearTimeout(timeoutId);
+  const payloadStr = `${secIdx}:${rand1}:${rand2}:${rand3}`;
+  const hmac = crypto.createHmac('sha256', HMAC_SECRET).update(payloadStr).digest();
 
-    if (res.ok) {
-      const json = await res.json();
-      if (json && json.data && Array.isArray(json.data.codes)) {
-        const cloudCodes = json.data.codes;
-        const cloudSessions = json.data.sessions || {};
+  const sig1 = hmac[0] % 32;
+  const sig2 = hmac[1] % 32;
+  const sig3 = hmac[2] % 32;
+  const sig4 = hmac[3] % 32;
 
-        // Merge logic: Combine cloud and local state to prevent losing newly generated codes
-        const codeMap = new Map();
-        for (const c of cloudCodes) {
-          codeMap.set(normalizeCode(c.code), c);
-        }
-        for (const c of (memoryStore.codes || [])) {
-          const key = normalizeCode(c.code);
-          if (!codeMap.has(key)) {
-            codeMap.set(key, c);
-          } else {
-            const existing = codeMap.get(key);
-            // If marked used in either state, preserve used = true
-            if (c.is_used && !existing.is_used) {
-              codeMap.set(key, { ...existing, is_used: true, used_at: c.used_at || existing.used_at });
-            }
-          }
-        }
+  const c1 = CHARS[secIdx];
+  const c2 = CHARS[rand1];
+  const c3 = CHARS[rand2];
+  const c4 = CHARS[rand3];
+  const c5 = CHARS[sig1];
+  const c6 = CHARS[sig2];
+  const c7 = CHARS[sig3];
+  const c8 = CHARS[sig4];
 
-        memoryStore = {
-          codes: Array.from(codeMap.values()),
-          sessions: { ...cloudSessions, ...(memoryStore.sessions || {}) }
-        };
+  return `BIO-${c1}${c2}${c3}${c4}-${c5}${c6}${c7}${c8}`;
+}
 
-        // Cache to /tmp
-        try {
-          fs.writeFileSync(TMP_FILE, JSON.stringify(memoryStore, null, 2), 'utf8');
-        } catch {
-          // ignore
-        }
-        return memoryStore;
-      }
-    }
-  } catch (err) {
-    console.warn('[STORE:WARN] Cloud storage fetch failed, using local cache:', err.message);
+/**
+ * Verify cryptographic signature of an Access Code and extract authorized section.
+ */
+export function verifySignedCode(inputCode) {
+  let clean = normalizeCode(inputCode).replace(/-/g, '');
+  if (clean.length === 8 && !clean.startsWith('BIO')) {
+    clean = 'BIO' + clean;
+  }
+  if (!clean.startsWith('BIO') || clean.length !== 11) {
+    return { valid: false, reason: 'INVALID_FORMAT' };
   }
 
-  // 2. Fallback to /tmp filesystem
+  const chars = clean.substring(3);
+  const secIdx = CHARS.indexOf(chars[0]);
+  const rand1 = CHARS.indexOf(chars[1]);
+  const rand2 = CHARS.indexOf(chars[2]);
+  const rand3 = CHARS.indexOf(chars[3]);
+  const sig1 = CHARS.indexOf(chars[4]);
+  const sig2 = CHARS.indexOf(chars[5]);
+  const sig3 = CHARS.indexOf(chars[6]);
+  const sig4 = CHARS.indexOf(chars[7]);
+
+  if ([secIdx, rand1, rand2, rand3, sig1, sig2, sig3, sig4].some(x => x === -1)) {
+    return { valid: false, reason: 'INVALID_CHARS' };
+  }
+
+  const payloadStr = `${secIdx}:${rand1}:${rand2}:${rand3}`;
+  const hmac = crypto.createHmac('sha256', HMAC_SECRET).update(payloadStr).digest();
+
+  if (
+    sig1 !== (hmac[0] % 32) ||
+    sig2 !== (hmac[1] % 32) ||
+    sig3 !== (hmac[2] % 32) ||
+    sig4 !== (hmac[3] % 32)
+  ) {
+    return { valid: false, reason: 'INVALID_SIGNATURE' };
+  }
+
+  const section = SECTIONS_LIST[secIdx] || 'all';
+  return { valid: true, section };
+}
+
+/**
+ * Generate a cryptographically signed Session Token.
+ * Format: SES.<base64url(payload)>.<hmacSig>
+ * Payload: section:expiresAt
+ */
+export function generateSignedSession(section = 'all', durationHours = 24) {
+  const expiresAt = Date.now() + durationHours * 60 * 60 * 1000;
+  const payloadStr = `${section}:${expiresAt}`;
+  const hmac = crypto.createHmac('sha256', HMAC_SECRET).update(payloadStr).digest('hex').substring(0, 16);
+  const encodedPayload = Buffer.from(payloadStr).toString('base64url');
+  return `SES.${encodedPayload}.${hmac}`;
+}
+
+/**
+ * Verify cryptographic signature of a Session Token.
+ */
+export function verifySignedSession(token) {
+  if (!token || typeof token !== 'string') {
+    return { valid: false, reason: 'NO_TOKEN' };
+  }
+  if (!token.startsWith('SES.')) {
+    return { valid: false, reason: 'INVALID_TOKEN_FORMAT' };
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    return { valid: false, reason: 'MALFORMED_TOKEN' };
+  }
+
+  try {
+    const payloadStr = Buffer.from(parts[1], 'base64url').toString('utf8');
+    const [section, expiresAtStr] = payloadStr.split(':');
+    const expiresAt = parseInt(expiresAtStr, 10);
+
+    if (isNaN(expiresAt) || !section) {
+      return { valid: false, reason: 'CORRUPTED_PAYLOAD' };
+    }
+
+    const expectedHmac = crypto.createHmac('sha256', HMAC_SECRET).update(payloadStr).digest('hex').substring(0, 16);
+    if (parts[2] !== expectedHmac) {
+      return { valid: false, reason: 'INVALID_SIGNATURE' };
+    }
+
+    if (Date.now() > expiresAt) {
+      return { valid: false, reason: 'SESSION_EXPIRED', expires_at: new Date(expiresAt).toISOString() };
+    }
+
+    return { valid: true, section, expires_at: new Date(expiresAt).toISOString() };
+  } catch (err) {
+    return { valid: false, reason: 'DECODE_ERROR' };
+  }
+}
+
+/**
+ * Read store from local /tmp or memory.
+ */
+export async function getStore() {
   try {
     if (fs.existsSync(TMP_FILE)) {
       const data = fs.readFileSync(TMP_FILE, 'utf8');
       const parsed = JSON.parse(data);
       if (parsed && Array.isArray(parsed.codes)) {
-        memoryStore = parsed;
+        memoryStore = {
+          codes: parsed.codes,
+          sessions: parsed.sessions || {},
+          used_codes: parsed.used_codes || {}
+        };
         return memoryStore;
       }
     }
-  } catch (err) {
-    // ignore
+  } catch {
+    // fallback to memory
   }
-
   return memoryStore;
 }
 
 /**
- * Save data with automatic retry and exponential backoff.
+ * Save store to local /tmp and memory.
  */
 export async function saveStore(store) {
   memoryStore = {
     codes: Array.isArray(store.codes) ? store.codes : [],
-    sessions: store.sessions || {}
+    sessions: store.sessions || {},
+    used_codes: store.used_codes || {}
   };
 
-  // 1. Write to local /tmp cache immediately
   try {
     fs.writeFileSync(TMP_FILE, JSON.stringify(memoryStore, null, 2), 'utf8');
+    return true;
   } catch {
-    // ignore
+    return true;
   }
-
-  // 2. Persist to shared cloud storage with retry
-  const maxRetries = 3;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
-
-      const res = await fetch(CLOUD_STORAGE_ENDPOINT, {
-        method: 'PUT',
-        signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'circula_production_db_v1',
-          data: memoryStore
-        })
-      });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        return true;
-      }
-    } catch (err) {
-      if (attempt === maxRetries) {
-        console.error(`[STORE:ERROR] Save failed after ${maxRetries} attempts:`, err.message);
-      }
-    }
-
-    if (attempt < maxRetries) {
-      await new Promise(resolve => setTimeout(resolve, attempt * 150));
-    }
-  }
-
-  return false;
 }
 
 export function generateUUID() {

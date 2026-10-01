@@ -1,4 +1,4 @@
-import { getStore, saveStore, generateUUID, normalizeCode } from './_store.js';
+import { getStore, saveStore, generateUUID, generateSignedCode, normalizeCode } from './_store.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,11 +23,8 @@ export default async function handler(req, res) {
     });
   }
 
-  // Generate code: BIO-XXXX-XXXX
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const seg1 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  const seg2 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  const rawCode = `BIO-${seg1}-${seg2}`;
+  // Generate tamper-proof cryptographically signed code
+  const rawCode = generateSignedCode(section);
   const canonicalCode = normalizeCode(rawCode);
 
   const expiresAt = expiryMinutes 

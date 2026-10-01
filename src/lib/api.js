@@ -201,22 +201,84 @@ export const sessionManager = {
 };
 
 // =============================================================================
-// Offline Local Cache (No hardcoded demo codes)
+// Offline & Same-Device Local Cache
 // =============================================================================
 const OFFLINE_CODES_KEY = 'circula_offline_codes';
-const SEED_OFFLINE_CODES = [];
+const USED_CODES_KEY = 'circula_used_codes';
 
 function getOfflineCodes() {
   const raw = localStorage.getItem(OFFLINE_CODES_KEY);
-  if (!raw) {
-    localStorage.setItem(OFFLINE_CODES_KEY, JSON.stringify(SEED_OFFLINE_CODES));
-    return SEED_OFFLINE_CODES;
-  }
-  try { return JSON.parse(raw); } catch { return SEED_OFFLINE_CODES; }
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch { return []; }
 }
 
 function saveOfflineCodes(codes) {
   localStorage.setItem(OFFLINE_CODES_KEY, JSON.stringify(codes));
+}
+
+function recordUsedCodeLocally(cleanCode) {
+  const raw = localStorage.getItem(USED_CODES_KEY);
+  let used = [];
+  try { used = JSON.parse(raw) || []; } catch { used = []; }
+  if (!used.includes(cleanCode)) {
+    used.push(cleanCode);
+    localStorage.setItem(USED_CODES_KEY, JSON.stringify(used));
+  }
+}
+
+function isCodeUsedLocally(cleanCode) {
+  const raw = localStorage.getItem(USED_CODES_KEY);
+  if (!raw) return false;
+  try {
+    const used = JSON.parse(raw);
+    return Array.isArray(used) && used.includes(cleanCode);
+  } catch {
+    return false;
+  }
+}
+
+function claimCodeLocally(cleanCode) {
+  const codes = getOfflineCodes();
+  const target = codes.find(c => c.code.toUpperCase() === cleanCode);
+  if (!target) return null;
+
+  if (target.is_used || isCodeUsedLocally(cleanCode)) {
+    return {
+      success: false,
+      error_code: 'ALREADY_USED',
+      message: 'Access Code ini sudah digunakan oleh pengunjung lain.'
+    };
+  }
+
+  if (target.expires_at && new Date(target.expires_at) <= new Date()) {
+    return {
+      success: false,
+      error_code: 'EXPIRED',
+      message: 'Masa berlaku Access Code ini telah berakhir.'
+    };
+  }
+
+  target.is_used = true;
+  target.used_at = new Date().toISOString();
+  saveOfflineCodes(codes);
+  recordUsedCodeLocally(cleanCode);
+
+  const token = 'ses_local_' + Math.random().toString(36).substring(2) + Date.now();
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+  sessionManager.saveSession(token, {
+    section: target.section,
+    expires_at: expiresAt,
+    claimed_at: new Date().toISOString()
+  });
+
+  return {
+    success: true,
+    message: 'Verifikasi berhasil. Akses dibuka.',
+    section: target.section,
+    session_token: token,
+    expires_at: expiresAt
+  };
 }
 
 // =============================================================================
@@ -224,9 +286,13 @@ function saveOfflineCodes(codes) {
 // =============================================================================
 export const apiService = {
   async verifyAndClaimCode(inputCode) {
-    const cleanCode = (inputCode || '').trim().toUpperCase();
+    let cleanCode = (inputCode || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
     if (!cleanCode) {
       return { success: false, message: 'Harap masukkan Access Code.' };
+    }
+
+    if (cleanCode.length === 8 && !cleanCode.startsWith('BIO')) {
+      cleanCode = 'BIO-' + cleanCode.substring(0, 4) + '-' + cleanCode.substring(4);
     }
 
     try {
@@ -237,54 +303,64 @@ export const apiService = {
       });
       const data = await res.json();
 
-      if (data.success && data.session_token) {
+      if (res.ok && data.success && data.session_token) {
         sessionManager.saveSession(data.session_token, {
           section: data.section,
           expires_at: data.expires_at,
           claimed_at: new Date().toISOString()
         });
+
+        // Mark as used in local cache so same device knows immediately
+        const codes = getOfflineCodes();
+        const target = codes.find(c => c.code.toUpperCase() === cleanCode);
+        if (target) {
+          target.is_used = true;
+          target.used_at = new Date().toISOString();
+          saveOfflineCodes(codes);
+        }
+        recordUsedCodeLocally(cleanCode);
+
+        return data;
       }
+
+      // If server returned 400 (ALREADY_USED or EXPIRED), honor it immediately
+      if (res.status === 400) {
+        return data;
+      }
+
+      // If server returned 404 (NOT_FOUND), check local cache fallback
+      if (res.status === 404) {
+        const localClaim = claimCodeLocally(cleanCode);
+        if (localClaim) return localClaim;
+      }
+
       return data;
     } catch (err) {
-      console.warn('API route fallback to local engine:', err);
-      const codes = getOfflineCodes();
-      const idx = codes.findIndex(c => c.code.toUpperCase() === cleanCode);
-
-      if (idx === -1) {
-        return { success: false, error_code: 'NOT_FOUND', message: 'Access Code tidak ditemukan. Periksa kembali kode Anda.' };
-      }
-      if (codes[idx].is_used) {
-        return { success: false, error_code: 'ALREADY_USED', message: 'Access code ini sudah pernah digunakan oleh siswa lain.' };
-      }
-      if (codes[idx].expires_at && new Date(codes[idx].expires_at) <= new Date()) {
-        return { success: false, error_code: 'EXPIRED', message: 'Masa berlaku Access Code ini telah berakhir.' };
-      }
-
-      codes[idx].is_used = true;
-      codes[idx].used_at = new Date().toISOString();
-      saveOfflineCodes(codes);
-
-      const token = 'ses_' + Math.random().toString(36).substring(2) + Date.now();
-      const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
-
-      sessionManager.saveSession(token, {
-        section: codes[idx].section,
-        expires_at: expiresAt,
-        claimed_at: new Date().toISOString()
-      });
-
+      console.warn('Network error during verify, falling back to local engine:', err);
+      const localClaim = claimCodeLocally(cleanCode);
+      if (localClaim) return localClaim;
       return {
-        success: true,
-        message: 'Verifikasi berhasil. Menu materi telah dibuka.',
-        section: codes[idx].section,
-        session_token: token,
-        expires_at: expiresAt
+        success: false,
+        error_code: 'NOT_FOUND',
+        message: 'Access Code tidak ditemukan. Periksa kembali kode dari operator.'
       };
     }
   },
 
   async validateSession(token, requiredSection) {
     if (!token) return { valid: false, reason: 'NO_TOKEN' };
+
+    // If local session token, validate locally
+    if (token.startsWith('ses_local_')) {
+      const sessions = sessionManager.getAllSessions();
+      const s = sessions[token];
+      if (!s) return { valid: false, reason: 'SESSION_NOT_FOUND' };
+      if (s.expires_at && new Date(s.expires_at) <= new Date()) return { valid: false, reason: 'SESSION_EXPIRED' };
+      if (requiredSection && s.section !== 'all' && s.section !== requiredSection) {
+        return { valid: false, reason: 'PERMISSION_DENIED', allowed_section: s.section };
+      }
+      return { valid: true, section: s.section, expires_at: s.expires_at };
+    }
 
     try {
       const res = await fetch('/api/validate-session', {
@@ -314,9 +390,20 @@ export const apiService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section, expiryMinutes, devSecret })
       });
-      return await res.json();
+      const data = await res.json();
+      if (data && data.code) {
+        const codes = getOfflineCodes();
+        const existingIdx = codes.findIndex(c => c.code === data.code);
+        if (existingIdx >= 0) {
+          codes[existingIdx] = data;
+        } else {
+          codes.unshift(data);
+        }
+        saveOfflineCodes(codes);
+      }
+      return data;
     } catch (err) {
-      console.warn('Generate code local fallback:', err);
+      console.warn('Generate code network fallback:', err);
       const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
       const seg1 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
       const seg2 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -341,6 +428,7 @@ export const apiService = {
   },
 
   async getOperatorCodes({ search = '', status = 'ALL', section = 'ALL' } = {}) {
+    let serverCodes = [];
     try {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
@@ -348,32 +436,66 @@ export const apiService = {
       if (section && section !== 'ALL') params.append('section', section);
 
       const res = await fetch(`/api/codes?${params.toString()}`);
-      return await res.json();
+      if (res.ok) {
+        serverCodes = await res.json();
+      }
     } catch (err) {
-      let list = getOfflineCodes();
-      if (search) {
-        list = list.filter(c => c.code.toUpperCase().includes(search.toUpperCase()));
-      }
-      if (section && section !== 'ALL') {
-        list = list.filter(c => c.section === section);
-      }
-      return list;
+      console.warn('Could not fetch server codes, using local store:', err);
     }
+
+    // Merge server codes with local codes (deduplicated by normalized code)
+    const localCodes = getOfflineCodes();
+    const map = new Map();
+    for (const c of localCodes) {
+      map.set(c.code.toUpperCase(), c);
+    }
+    for (const c of serverCodes) {
+      map.set(c.code.toUpperCase(), c);
+    }
+
+    let list = Array.from(map.values());
+
+    if (search) {
+      const q = search.toUpperCase();
+      list = list.filter(c => c.code.toUpperCase().includes(q));
+    }
+    if (section && section !== 'ALL') {
+      list = list.filter(c => c.section === section);
+    }
+    const now = new Date();
+    if (status === 'UNUSED') {
+      list = list.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now));
+    } else if (status === 'USED') {
+      list = list.filter(c => c.is_used);
+    } else if (status === 'EXPIRED') {
+      list = list.filter(c => !c.is_used && c.expires_at && new Date(c.expires_at) <= now);
+    }
+
+    return list;
   },
 
   async getDashboardStats() {
+    let stats = null;
     try {
       const res = await fetch('/api/stats');
-      return await res.json();
-    } catch (err) {
-      const codes = getOfflineCodes();
-      const now = new Date();
-      return {
-        total: codes.length,
-        used: codes.filter(c => c.is_used).length,
-        unused: codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length,
-        activeSessions: 1
-      };
+      if (res.ok) {
+        stats = await res.json();
+      }
+    } catch {
+      // ignore
     }
+
+    const codes = await apiService.getOperatorCodes();
+    const now = new Date();
+    const total = codes.length;
+    const used = codes.filter(c => c.is_used).length;
+    const unused = codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length;
+
+    return {
+      total: Math.max(total, stats?.total || 0),
+      used: Math.max(used, stats?.used || 0),
+      unused: Math.max(unused, stats?.unused || 0),
+      activeSessions: stats?.activeSessions || 1
+    };
   }
 };
