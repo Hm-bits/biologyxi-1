@@ -78,7 +78,335 @@ function Menu2Content() {
           whyFit="Menampilkan animasi pemisahan komponen darah (plasma, eritrosit, leukosit, dan trombosit) beserta bentuk serta fungsinya masing-masing secara spesifik."
         />
 
-        {/* 1. EMPAT ELEMEN SUP DARAH */}
+        {/* =========================================================================
+            BAGIAN BAGAN ANATOMI LENGKAP KOMPONEN DARAH
+            ========================================================================= */}
+        <div className="med-card" style={{ padding: '36px 32px', marginBottom: '40px' }}>
+          <div style={{ maxWidth: '820px', marginBottom: '24px' }}>
+            <span className="badge-pill badge-red" style={{ marginBottom: '8px' }}>
+              Morfologi Vaskular
+            </span>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-dark)', margin: 0 }}>
+              Diagram Mikroskopis Komponen Darah Manusia
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--color-secondary-text)', marginTop: '4px' }}>
+              Menggambarkan keluarnya aliran darah dari pembuluh darah (blood vessel) yang memperlihatkan fasa cair plasma kuning, sel darah merah (red blood cells), sel darah putih (white blood cell), dan keping pembekuan (platelets).
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '28px',
+            alignItems: 'center'
+          }}>
+            {/* Gambar Komposisi Komponen Darah */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid var(--color-border)',
+              borderRadius: '20px',
+              padding: '16px',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
+                <img
+                  src="/images/komponen-darah-lengkap.png"
+                  alt="Komponen Darah Manusia - Eritrosit, Leukosit, Trombosit, Plasma"
+                  style={{
+                    width: '100%',
+                    maxHeight: '420px',
+                    objectFit: 'contain',
+                    borderRadius: '10px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--color-dark)', fontWeight: 700 }}>
+                Visualisasi Anatomi Komponen Darah di Dalam Pembuluh
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--color-secondary-text)', margin: '4px 0 0' }}>
+                Sumber: Encyclopaedia Britannica — Memperlihatkan matriks plasma cair yang melarutkan serta menghanyutkan elemen-elemen sel darah.
+              </p>
+            </div>
+
+            {/* Ringkasan Cepat Fasa Darah */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ backgroundColor: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '16px 20px' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#854D0E', margin: '0 0 4px' }}>
+                  🟡 Fasa Cair: Plasma Darah (55%)
+                </h4>
+                <p style={{ fontSize: '13px', color: '#713F12', margin: 0, lineHeight: 1.6 }}>
+                  Cairan bening kekuningan yang 90%-nya adalah air, bertindak sebagai medium transportasi nutrisi, protein, antibodi, dan zat sisa.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: '#FEF2F2', border: '1.5px solid #FECACA', borderRadius: '14px', padding: '16px 20px' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-primary)', margin: '0 0 4px' }}>
+                  🔴 Fasa Padat: Eritrosit / Sel Darah Merah (44%)
+                </h4>
+                <p style={{ fontSize: '13px', color: '#7F1D1D', margin: 0, lineHeight: 1.6 }}>
+                  Bentuk cakram bikonkaf tanpa inti berisi hemoglobin untuk pengikatan gas O₂ dari paru-paru dan CO₂ dari jaringan.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: '14px', padding: '16px 20px' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#1E40AF', margin: '0 0 4px' }}>
+                  🛡️ Fasa Proteksi: Leukosit & Trombosit (&lt;1%)
+                </h4>
+                <p style={{ fontSize: '13px', color: '#1E3A8A', margin: 0, lineHeight: 1.6 }}>
+                  Leukosit bertugas melawan infeksi kuman & benda asing; Trombosit memicu pembekuan benang fibrin saat terjadi luka.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            MATERI LENGKAP 4 KOMPONEN UTAMA DARAH
+            ========================================================================= */}
+        <div className="med-card" style={{ padding: '36px 32px', marginBottom: '40px' }}>
+          <div style={{ maxWidth: '820px', marginBottom: '28px' }}>
+            <span className="badge-pill badge-red" style={{ marginBottom: '8px' }}>
+              Materi Inti Menu 2
+            </span>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-dark)', margin: 0 }}>
+              Karakteristik & Fungsi 4 Komponen Darah
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--color-secondary-text)', marginTop: '4px' }}>
+              Ulasan mendalam mengenai plasma darah serta 3 elemen seluler pembentuk sistem sirkulasi tubuh:
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            
+            {/* 1. Plasma Darah */}
+            <div style={{
+              backgroundColor: '#FEFCE8',
+              border: '1.5px solid #FEF08A',
+              borderRadius: '18px',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: '#EAB308',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '16px'
+                }}>
+                  1
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#854D0E', margin: 0 }}>
+                    Plasma Darah
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#A16207', fontWeight: 600 }}>Fasa Cair • 55% Volume Total Darah</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FEF08A' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#A16207', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Definisi & Karakteristik
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Bagian cair dari darah yang berwarna kekuningan dan menyusun sekitar <strong>55% dari total volume darah</strong> di dalam tubuh.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FEF08A' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#A16207', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Kandungan
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Sebagian besar plasma darah terdiri dari <strong>air (sekitar 90%)</strong>, serta zat-zat terlarut seperti protein darah (albumin, globulin, fibrinogen), sari-sari makanan (glukosa, asam amino), sisa metabolisme (karbondioksida, urea), hormon, dan mineral.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FEF08A', gridColumn: '1 / -1' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#854D0E', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Fungsi Utama
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Berperan sebagai medium atau cairan pelarut untuk mengangkut sari-sari makanan, hormon, antibodi, serta zat sisa metabolisme dari dan ke seluruh sel jaringan tubuh.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Eritrosit (Sel Darah Merah) */}
+            <div style={{
+              backgroundColor: '#FEF2F2',
+              border: '1.5px solid #FECACA',
+              borderRadius: '18px',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--color-primary)',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '16px'
+                }}>
+                  2
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '19px', fontWeight: 800, color: 'var(--color-primary)', margin: 0 }}>
+                    Eritrosit (Sel Darah Merah)
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#991B1B', fontWeight: 600 }}>Cakram Bikonkaf • Tanpa Inti Sel</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FECACA' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Definisi & Karakteristik
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Komponen sel darah yang paling banyak jumlahnya dan memberikan warna merah pada darah. Sel ini berbentuk <strong>cakram bikonkaf (cekung di kedua sisi)</strong> dan tidak memiliki inti sel agar ruang untuk mengangkut gas menjadi lebih maksimal.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FECACA' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Kandungan Khusus
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Mengandung protein kaya zat besi yang disebut <strong>hemoglobin (Hb)</strong>.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #FECACA', gridColumn: '1 / -1' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Fungsi Utama
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Mengikat dan mengangkut oksigen (O₂) dari paru-paru untuk diedarkan ke seluruh jaringan tubuh, serta membantu membawa sebagian karbondioksida (CO₂) kembali ke paru-paru.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Leukosit (Sel Darah Putih) */}
+            <div style={{
+              backgroundColor: '#EFF6FF',
+              border: '1.5px solid #BFDBFE',
+              borderRadius: '18px',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: '#2563EB',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '16px'
+                }}>
+                  3
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#1E40AF', margin: 0 }}>
+                    Leukosit (Sel Darah Putih)
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#2563EB', fontWeight: 600 }}>Memiliki Inti Sel • Bentuk Berubah-ubah</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #BFDBFE' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#1E40AF', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Definisi & Karakteristik
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Sel darah yang memiliki <strong>bentuk tidak tetap (berubah-ubah)</strong>, berukuran lebih besar daripada eritrosit, dan <strong>memiliki inti sel</strong>. Jumlahnya jauh lebih sedikit dibandingkan sel darah merah.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #BFDBFE' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#1E40AF', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Fungsi Utama & Pertahanan
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Berfungsi sebagai <strong>pertahanan utama tubuh</strong>. Leukosit bertugas mengenali, melawan, dan membunuh kuman penyakit, bakteri, virus, atau benda asing yang masuk ke dalam tubuh melalui proses <strong>fagositosis</strong> (memangsa sel asing) serta membentuk <strong>antibodi</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Trombosit (Keping Darah) */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid #CBD5E1',
+              borderRadius: '18px',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: '#475569',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '16px'
+                }}>
+                  4
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#334155', margin: 0 }}>
+                    Trombosit (Keping Darah)
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>Fragmen Sel Tanpa Inti • Hemostasis</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Definisi & Karakteristik
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Fragmen atau potongan sel-sel kecil yang <strong>tidak memiliki inti sel</strong> dan bentuknya tidak beraturan.
+                  </p>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '16px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Fungsi Utama & Pembekuan
+                  </div>
+                  <p style={{ fontSize: '13px', color: 'var(--color-dark)', lineHeight: 1.6, margin: 0 }}>
+                    Berperan penting dalam proses <strong>pembekuan darah</strong>. Ketika seseorang mengalami luka atau pembuluh darah yang robek, trombosit akan pecah dan mengeluarkan enzim <strong>trombokinase</strong> yang memicu rangkaian kimiawi (mengubah protrombin menjadi trombin, lalu fibrinogen menjadi benang-benang fibrin) untuk menutup luka dan menghentikan pendarahan.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* 1. EMPAT ELEMEN SUP DARAH (RINGKASAN & MATRIKS) */}
         <div style={{ marginBottom: '48px' }}>
           <div style={{
             display: 'grid',
