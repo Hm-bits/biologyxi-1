@@ -76,6 +76,197 @@ function Menu5Content() {
           whyFit="Memperlihatkan grafik dan alur pergerakan darah secara visual: rute Peredaran Darah Kecil (Jantung -> Paru-paru -> Jantung) dan Peredaran Darah Besar (Jantung -> Seluruh Tubuh -> Jantung)."
         />
 
+        {/* BAGIAN MATERI INTI & BAGAN ANATOMI SIRKULASI GANDA */}
+        <div className="med-card" style={{ padding: '36px 32px', marginBottom: '40px' }}>
+          <div style={{ maxWidth: '820px', marginBottom: '24px' }}>
+            <span className="badge-pill badge-green" style={{ marginBottom: '8px' }}>
+              Materi Inti Sistem Sirkulasi
+            </span>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-dark)', margin: 0 }}>
+              Sistem Peredaran Darah Manusia: Sirkulasi Ganda
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--color-secondary-text)', marginTop: '4px' }}>
+              Peredaran darah manusia disebut sirkulasi ganda karena dalam satu kali beredar ke seluruh tubuh, darah mengalir melewati jantung sebanyak dua kali melalui dua sirkuit utama:
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '28px',
+            alignItems: 'start'
+          }}>
+            {/* Kolom Visual Diagram Anatomi */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid var(--color-border)',
+              borderRadius: '20px',
+              padding: '16px',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
+                <img
+                  src="/images/sirkulasi-darah-ganda.jpg"
+                  alt="Bagan Sistem Peredaran Darah Kecil dan Besar Manusia"
+                  style={{
+                    width: '100%',
+                    maxHeight: '460px',
+                    objectFit: 'contain',
+                    borderRadius: '10px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--color-dark)', fontWeight: 700 }}>
+                Diagram Anatomi: Peredaran Darah Kecil & Besar
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '8px', fontSize: '12px', flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#2563EB', fontWeight: 700 }}>
+                  <span style={{ width: '12px', height: '12px', borderRadius: '3px', backgroundColor: '#2563EB' }}></span>
+                  Kaya Karbon Dioksida (CO₂)
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#DC2626', fontWeight: 700 }}>
+                  <span style={{ width: '12px', height: '12px', borderRadius: '3px', backgroundColor: '#DC2626' }}></span>
+                  Kaya Oksigen (O₂)
+                </span>
+              </div>
+            </div>
+
+            {/* Kolom Detail Uraian Materi 1 & 2 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              {/* 1. Sistem Peredaran Darah Kecil */}
+              <div style={{
+                backgroundColor: '#EFF6FF',
+                border: '1.5px solid #BFDBFE',
+                borderRadius: '18px',
+                padding: '24px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <span style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#2563EB',
+                    color: '#FFFFFF',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    1
+                  </span>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#1E40AF', margin: 0 }}>
+                    Sistem Peredaran Darah Kecil
+                  </h3>
+                </div>
+                
+                <p style={{ fontSize: '14px', color: '#1E3A8A', lineHeight: 1.7, margin: '0 0 14px' }}>
+                  Sistem peredaran darah dari <strong>jantung ke paru-paru kembali lagi ke jantung</strong>. Darah kaya karbon dioksida dipompa melalui <strong>bilik kanan</strong> jantung kemudian dialirkan melalui <strong>arteri pulmonalis</strong> ke <strong>paru-paru</strong> untuk pertukaran gas oksigen. Darah yang kaya oksigen kembali ke jantung melalui <strong>vena pulmonalis</strong> ke <strong>serambi kiri</strong>.
+                </p>
+
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  border: '1px solid #DBEAFE'
+                }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#2563EB', marginBottom: '6px' }}>
+                    Alur Ringkas Sirkulasi Kecil:
+                  </div>
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#1E40AF',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span>Jantung (Bilik Kanan)</span>
+                    <span style={{ color: '#93C5FD' }}>➔</span>
+                    <span>Arteri Pulmonalis</span>
+                    <span style={{ color: '#93C5FD' }}>➔</span>
+                    <span>Paru-Paru</span>
+                    <span style={{ color: '#93C5FD' }}>➔</span>
+                    <span>Vena Pulmonalis</span>
+                    <span style={{ color: '#93C5FD' }}>➔</span>
+                    <span>Jantung (Serambi Kiri)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Sistem Peredaran Darah Besar */}
+              <div style={{
+                backgroundColor: '#FEF2F2',
+                border: '1.5px solid #FECACA',
+                borderRadius: '18px',
+                padding: '24px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <span style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--color-primary)',
+                    color: '#FFFFFF',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    2
+                  </span>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-primary)', margin: 0 }}>
+                    Sistem Peredaran Darah Besar
+                  </h3>
+                </div>
+
+                <p style={{ fontSize: '14px', color: '#7F1D1D', lineHeight: 1.7, margin: '0 0 14px' }}>
+                  Sistem peredaran darah dari <strong>jantung ke seluruh tubuh kembali lagi ke jantung</strong>. Darah kaya oksigen dari <strong>bilik kiri</strong> jantung dialirkan melalui pembuluh <strong>aorta</strong> ke <strong>seluruh tubuh manusia</strong>. Darah yang kaya oksigen berubah menjadi kaya karbon dioksida, kemudian kembali ke jantung melalui <strong>vena</strong> ke <strong>serambi kanan</strong>.
+                </p>
+
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  border: '1px solid #FEE2E2'
+                }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', marginBottom: '6px' }}>
+                    Alur Ringkas Sirkulasi Besar:
+                  </div>
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#991B1B',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span>Jantung (Bilik Kiri)</span>
+                    <span style={{ color: '#FCA5A5' }}>➔</span>
+                    <span>Aorta</span>
+                    <span style={{ color: '#FCA5A5' }}>➔</span>
+                    <span>Seluruh Tubuh</span>
+                    <span style={{ color: '#FCA5A5' }}>➔</span>
+                    <span>Vena Kava</span>
+                    <span style={{ color: '#FCA5A5' }}>➔</span>
+                    <span>Jantung (Serambi Kanan)</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         {/* 1. PERBANDINGAN DUA RUTE SIRKULASI */}
         <div className="med-card" style={{ padding: '36px 32px', marginBottom: '40px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
