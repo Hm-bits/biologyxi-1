@@ -104,7 +104,7 @@ export const SECTIONS_INFO = [
 // =============================================================================
 const ROLE_KEY = 'circula_user_role';
 const DEV_AUTH_KEY = 'circula_dev_authenticated';
-const DEV_SECRET_PASS = 'doktxi1'; // Secret code kept internal
+const DEV_SECRET_PASS = 'dokter12'; // Secret code kept internal
 
 export const roleManager = {
   getRole: () => {
@@ -412,7 +412,7 @@ export const apiService = {
   },
 
   async generateCode({ section = 'all', expiryMinutes = null }) {
-    const devSecret = 'doktxi1';
+    const devSecret = 'dokter12';
 
     try {
       const res = await fetch('/api/generate-code', {

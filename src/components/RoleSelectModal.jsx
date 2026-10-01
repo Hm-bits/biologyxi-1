@@ -196,7 +196,7 @@ export default function RoleSelectModal({ isOpen, onClose, onRoleSelected }) {
 
           </div>
         ) : (
-          /* DEV PASSWORD INPUT VIEW (Secret: doktxi1) */
+          /* DEV PASSWORD INPUT VIEW (Secret: dokter12) */
           <div>
             <form onSubmit={handleDevSubmit}>
               <div style={{
