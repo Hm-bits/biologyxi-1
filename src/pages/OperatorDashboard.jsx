@@ -111,7 +111,11 @@ export default function OperatorDashboard() {
         expiryMinutes
       });
 
-      setGeneratedCodeResult(newCode);
+      if (newCode && newCode.code) {
+        setGeneratedCodeResult(newCode);
+      } else {
+        alert('Gagal membuat Access Code baru.');
+      }
       await loadDashboardData();
     } catch (err) {
       console.error('Code generation failed:', err);
@@ -122,7 +126,7 @@ export default function OperatorDashboard() {
   };
 
   const handleCopyCode = () => {
-    if (!generatedCodeResult) return;
+    if (!generatedCodeResult || !generatedCodeResult.code) return;
     navigator.clipboard.writeText(generatedCodeResult.code);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
@@ -465,7 +469,7 @@ export default function OperatorDashboard() {
           </form>
 
           {/* Generated Code Display */}
-          {generatedCodeResult && (
+          {generatedCodeResult && generatedCodeResult.code && (
             <div style={{
               backgroundColor: 'var(--color-soft-red)',
               borderRadius: '16px',

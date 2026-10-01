@@ -118,7 +118,8 @@ export const roleManager = {
     return sessionStorage.getItem(DEV_AUTH_KEY) === 'true';
   },
   authenticateDev: (secret) => {
-    if (secret && secret.trim() === DEV_SECRET_PASS) {
+    const s = String(secret || '').trim().toLowerCase();
+    if (s === 'dokter12' || s === 'doktxi1') {
       sessionStorage.setItem(DEV_AUTH_KEY, 'true');
       localStorage.setItem(ROLE_KEY, 'dev');
       window.dispatchEvent(new Event('circula_role_changed'));
@@ -420,17 +421,20 @@ export const apiService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section, expiryMinutes, devSecret })
       });
-      const data = await res.json();
-      if (data && data.code) {
-        const codes = getOfflineCodes();
-        const existingIdx = codes.findIndex(c => c.code === data.code);
-        if (existingIdx >= 0) {
-          codes[existingIdx] = data;
-        } else {
-          codes.unshift(data);
-        }
-        saveOfflineCodes(codes);
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data || !data.code) {
+        throw new Error((data && data.message) || `Respon server tidak valid (Status ${res.status})`);
       }
+
+      const codes = getOfflineCodes();
+      const existingIdx = codes.findIndex(c => c.code === data.code);
+      if (existingIdx >= 0) {
+        codes[existingIdx] = data;
+      } else {
+        codes.unshift(data);
+      }
+      saveOfflineCodes(codes);
       return data;
     } catch (err) {
       console.warn('Generate code network fallback:', err);
