@@ -11,7 +11,8 @@ import {
   Shield,
   GitBranch,
   Sparkles,
-  Droplet
+  Droplet,
+  Wind
 } from 'lucide-react';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import VideoPlayer from '../../components/VideoPlayer';
@@ -284,7 +285,7 @@ function Menu3Content() {
                       {chamber.name.split(' (')[0]}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--color-secondary-text)' }}>
-                      ({chamber.name.split(' (')[1]}
+                      {chamber.name.includes('(') ? `(${chamber.name.split('(')[1]}` : ''}
                     </div>
                   </button>
                 );

@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Home from './pages/Home';
@@ -61,31 +62,33 @@ export default function App() {
       <Navbar />
 
       <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Home />} />
 
-          {/* 5 Menu Tematik Kuliner Biologi (Sistem Peredaran Darah) */}
-          <Route path="/menu/1" element={<Menu1Platter />} />
-          <Route path="/menu/2" element={<Menu2Soup />} />
-          <Route path="/menu/3" element={<Menu3Heart />} />
-          <Route path="/menu/4" element={<Menu4Vessels />} />
-          <Route path="/menu/5" element={<Menu5Drinks />} />
+            {/* 5 Menu Tematik Kuliner Biologi (Sistem Peredaran Darah) */}
+            <Route path="/menu/1" element={<Menu1Platter />} />
+            <Route path="/menu/2" element={<Menu2Soup />} />
+            <Route path="/menu/3" element={<Menu3Heart />} />
+            <Route path="/menu/4" element={<Menu4Vessels />} />
+            <Route path="/menu/5" element={<Menu5Drinks />} />
 
-          {/* Direct Compatibility Aliases */}
-          <Route path="/material" element={<Menu1Platter />} />
-          <Route path="/heart" element={<Menu3Heart />} />
-          <Route path="/blood" element={<Menu2Soup />} />
-          <Route path="/vessels" element={<Menu4Vessels />} />
-          <Route path="/circulation" element={<Menu5Drinks />} />
-          <Route path="/special-area" element={<Menu5Drinks />} />
+            {/* Direct Compatibility Aliases */}
+            <Route path="/material" element={<Menu1Platter />} />
+            <Route path="/heart" element={<Menu3Heart />} />
+            <Route path="/blood" element={<Menu2Soup />} />
+            <Route path="/vessels" element={<Menu4Vessels />} />
+            <Route path="/circulation" element={<Menu5Drinks />} />
+            <Route path="/special-area" element={<Menu5Drinks />} />
 
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/access" element={<Access />} />
-          <Route path="/operator" element={<OperatorDashboard />} />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/access" element={<Access />} />
+            <Route path="/operator" element={<OperatorDashboard />} />
+            <Route path="/about" element={<About />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
 
       <Footer />
