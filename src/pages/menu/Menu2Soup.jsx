@@ -79,28 +79,91 @@ function Menu2Content() {
         />
 
         {/* =========================================================================
-            BAGIAN BAGAN ANATOMI LENGKAP KOMPONEN DARAH
+            BAGIAN BAGAN ANATOMI & SENTRIFUGASI KOMPONEN DARAH
             ========================================================================= */}
         <div className="med-card" style={{ padding: '36px 32px', marginBottom: '40px' }}>
           <div style={{ maxWidth: '820px', marginBottom: '24px' }}>
             <span className="badge-pill badge-red" style={{ marginBottom: '8px' }}>
-              Morfologi Vaskular
+              Morfologi Vaskular & Uji Sentrifugasi
             </span>
             <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-dark)', margin: 0 }}>
-              Diagram Mikroskopis Komponen Darah Manusia
+              Diagram Mikroskopis & Pemisahan Fasa Darah (Sentrifus)
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--color-secondary-text)', marginTop: '4px' }}>
-              Menggambarkan keluarnya aliran darah dari pembuluh darah (blood vessel) yang memperlihatkan fasa cair plasma kuning, sel darah merah (red blood cells), sel darah putih (white blood cell), dan keping pembekuan (platelets).
+              Pemisahan komponen darah melalui gaya sentrifugal menghasilkan 2 fasa utama: fasa cair (plasma kekuningan 55%) dan fasa padat elemen seluler (45%) yang mengendap di dasar tabung reaksi.
             </p>
           </div>
 
+          {/* 3 Diagram Cards Showcase */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '28px',
-            alignItems: 'center'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+            marginBottom: '28px'
           }}>
-            {/* Gambar Komposisi Komponen Darah */}
+            {/* Card 1: Sentrifugasi & Tabung Komposisi */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid var(--color-border)',
+              borderRadius: '20px',
+              padding: '16px',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
+                <img
+                  src="/images/sentrifugasi-komponen-darah.png"
+                  alt="Sentrifugasi Komponen Penyusun Darah"
+                  style={{
+                    width: '100%',
+                    maxHeight: '260px',
+                    objectFit: 'contain',
+                    borderRadius: '10px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
+                Pemisahan Tabung Sentrifus Darah
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--color-secondary-text)', margin: '4px 0 0', lineHeight: 1.5 }}>
+                Mesin sentrifus memutar tabung sampel darah hingga terpisah menjadi Plasma Darah (55%) di atas dan Sel Darah (45%) di bawah.
+              </p>
+            </div>
+
+            {/* Card 2: Lapisan Rinci Tabung Darah (Buffy Coat) */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid var(--color-border)',
+              borderRadius: '20px',
+              padding: '16px',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
+                <img
+                  src="/images/lapisan-tabung-darah.png"
+                  alt="3 Lapisan Tabung Darah: Plasma, Sel Putih & Trombosit, Sel Darah Merah"
+                  style={{
+                    width: '100%',
+                    maxHeight: '260px',
+                    objectFit: 'contain',
+                    borderRadius: '10px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
+                Stratifikasi 3 Lapisan Komponen
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--color-secondary-text)', margin: '4px 0 0', lineHeight: 1.5 }}>
+                Memperlihatkan lapisan atas (plasma), lapisan tipis tengah / <em>buffy coat</em> (sel darah putih & trombosit), dan endapan bawah (sel darah merah).
+              </p>
+            </div>
+
+            {/* Card 3: Mikroskopis Aliran Pembuluh Darah */}
             <div style={{
               backgroundColor: '#F8FAFC',
               border: '1.5px solid var(--color-border)',
@@ -112,10 +175,10 @@ function Menu2Content() {
               <div style={{ overflow: 'hidden', borderRadius: '16px', backgroundColor: '#FFFFFF', padding: '12px', border: '1px solid var(--color-border)' }}>
                 <img
                   src="/images/komponen-darah-lengkap.png"
-                  alt="Komponen Darah Manusia - Eritrosit, Leukosit, Trombosit, Plasma"
+                  alt="Komponen Darah Mikroskopis dalam Pembuluh"
                   style={{
                     width: '100%',
-                    maxHeight: '420px',
+                    maxHeight: '260px',
                     objectFit: 'contain',
                     borderRadius: '10px',
                     display: 'block',
@@ -123,42 +186,42 @@ function Menu2Content() {
                   }}
                 />
               </div>
-              <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--color-dark)', fontWeight: 700 }}>
-                Visualisasi Anatomi Komponen Darah di Dalam Pembuluh
+              <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--color-dark)', fontWeight: 700 }}>
+                Visualisasi Mikroskopis Pembuluh Darah
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--color-secondary-text)', margin: '4px 0 0' }}>
-                Sumber: Encyclopaedia Britannica — Memperlihatkan matriks plasma cair yang melarutkan serta menghanyutkan elemen-elemen sel darah.
+              <p style={{ fontSize: '12px', color: 'var(--color-secondary-text)', margin: '4px 0 0', lineHeight: 1.5 }}>
+                Menggambarkan fasa cair plasma yang melarutkan serta menghanyutkan eritrosit bikonkaf, leukosit, dan keping trombosit di dalam pembuluh vaskular.
+              </p>
+            </div>
+          </div>
+
+          {/* Ringkasan Cepat Fasa Darah */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+            <div style={{ backgroundColor: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '16px 20px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#854D0E', margin: '0 0 4px' }}>
+                🟡 Fasa Cair: Plasma Darah (55%)
+              </h4>
+              <p style={{ fontSize: '12px', color: '#713F12', margin: 0, lineHeight: 1.6 }}>
+                Lapisan cairan bening kekuningan di bagian atas tabung (90% air + protein albumin, globulin, fibrinogen, glukosa, dan hormon).
               </p>
             </div>
 
-            {/* Ringkasan Cepat Fasa Darah */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ backgroundColor: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '16px 20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#854D0E', margin: '0 0 4px' }}>
-                  🟡 Fasa Cair: Plasma Darah (55%)
-                </h4>
-                <p style={{ fontSize: '13px', color: '#713F12', margin: 0, lineHeight: 1.6 }}>
-                  Cairan bening kekuningan yang 90%-nya adalah air, bertindak sebagai medium transportasi nutrisi, protein, antibodi, dan zat sisa.
-                </p>
-              </div>
+            <div style={{ backgroundColor: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: '14px', padding: '16px 20px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#1E40AF', margin: '0 0 4px' }}>
+                ⚪ Buffy Coat: Leukosit & Trombosit (&lt;1%)
+              </h4>
+              <p style={{ fontSize: '12px', color: '#1E3A8A', margin: 0, lineHeight: 1.6 }}>
+                Lapisan tipis berwarna putih kelabu di antara plasma dan sel merah, berisi leukosit penangkal infeksi dan fragmen trombosit pembeku.
+              </p>
+            </div>
 
-              <div style={{ backgroundColor: '#FEF2F2', border: '1.5px solid #FECACA', borderRadius: '14px', padding: '16px 20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-primary)', margin: '0 0 4px' }}>
-                  🔴 Fasa Padat: Eritrosit / Sel Darah Merah (44%)
-                </h4>
-                <p style={{ fontSize: '13px', color: '#7F1D1D', margin: 0, lineHeight: 1.6 }}>
-                  Bentuk cakram bikonkaf tanpa inti berisi hemoglobin untuk pengikatan gas O₂ dari paru-paru dan CO₂ dari jaringan.
-                </p>
-              </div>
-
-              <div style={{ backgroundColor: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: '14px', padding: '16px 20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#1E40AF', margin: '0 0 4px' }}>
-                  🛡️ Fasa Proteksi: Leukosit & Trombosit (&lt;1%)
-                </h4>
-                <p style={{ fontSize: '13px', color: '#1E3A8A', margin: 0, lineHeight: 1.6 }}>
-                  Leukosit bertugas melawan infeksi kuman & benda asing; Trombosit memicu pembekuan benang fibrin saat terjadi luka.
-                </p>
-              </div>
+            <div style={{ backgroundColor: '#FEF2F2', border: '1.5px solid #FECACA', borderRadius: '14px', padding: '16px 20px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-primary)', margin: '0 0 4px' }}>
+                🔴 Fasa Padat: Eritrosit (44%–45%)
+              </h4>
+              <p style={{ fontSize: '12px', color: '#7F1D1D', margin: 0, lineHeight: 1.6 }}>
+                Lapisan merah pekat di dasar tabung berisi sel darah merah bikonkaf ber-hemoglobin pembawa oksigen vital ke seluruh sel tubuh.
+              </p>
             </div>
           </div>
         </div>
