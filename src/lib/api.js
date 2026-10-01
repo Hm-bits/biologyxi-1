@@ -137,30 +137,31 @@ export const roleManager = {
 };
 
 // =============================================================================
-// Session Management
+// Ephemeral Session Management (Single Page-Lifecycle for Students)
+// User requirement: "kalo udah masuk terus ke reload itu ilang kodenya jadi harus minta ulang"
+// Sessions exist ONLY in JavaScript memory while the student browses.
+// As soon as the page is refreshed / reloaded / re-entered, memory resets to {}.
 // =============================================================================
-const SESSIONS_STORE_KEY = 'circula_unlocked_sessions';
+let activeSessionsInMemory = {};
+
+// Clean up any historical persistent sessions from storage
+try {
+  localStorage.removeItem('circula_unlocked_sessions');
+  sessionStorage.removeItem('circula_unlocked_sessions');
+} catch {}
 
 export const sessionManager = {
   getAllSessions: () => {
-    const raw = localStorage.getItem(SESSIONS_STORE_KEY);
-    if (!raw) return {};
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return {};
-    }
+    return { ...activeSessionsInMemory };
   },
 
   saveSession: (token, data) => {
-    const sessions = sessionManager.getAllSessions();
-    sessions[token] = {
+    activeSessionsInMemory[token] = {
       token,
       section: data.section,
       expires_at: data.expires_at,
       claimed_at: data.claimed_at || new Date().toISOString()
     };
-    localStorage.setItem(SESSIONS_STORE_KEY, JSON.stringify(sessions));
     window.dispatchEvent(new Event('circula_session_changed'));
   },
 
@@ -195,13 +196,13 @@ export const sessionManager = {
   },
 
   clearAllSessions: () => {
-    localStorage.removeItem(SESSIONS_STORE_KEY);
+    activeSessionsInMemory = {};
     window.dispatchEvent(new Event('circula_session_changed'));
   }
 };
 
 // =============================================================================
-// Offline & Same-Device Local Cache
+// Offline & Same-Device Local Cache for Codes & Usage Tracking
 // =============================================================================
 const OFFLINE_CODES_KEY = 'circula_offline_codes';
 const USED_CODES_KEY = 'circula_used_codes';
@@ -216,22 +217,30 @@ function saveOfflineCodes(codes) {
   localStorage.setItem(OFFLINE_CODES_KEY, JSON.stringify(codes));
 }
 
+function getUsedCodesLocally() {
+  const raw = localStorage.getItem(USED_CODES_KEY);
+  if (!raw) return [];
+  try { return JSON.parse(raw) || []; } catch { return []; }
+}
+
 function recordUsedCodeLocally(cleanCode) {
+  const norm = cleanCode.toUpperCase();
   const raw = localStorage.getItem(USED_CODES_KEY);
   let used = [];
   try { used = JSON.parse(raw) || []; } catch { used = []; }
-  if (!used.includes(cleanCode)) {
-    used.push(cleanCode);
+  if (!used.includes(norm)) {
+    used.push(norm);
     localStorage.setItem(USED_CODES_KEY, JSON.stringify(used));
   }
 }
 
 function isCodeUsedLocally(cleanCode) {
+  const norm = cleanCode.toUpperCase();
   const raw = localStorage.getItem(USED_CODES_KEY);
   if (!raw) return false;
   try {
     const used = JSON.parse(raw);
-    return Array.isArray(used) && used.includes(cleanCode);
+    return Array.isArray(used) && used.includes(norm);
   } catch {
     return false;
   }
@@ -295,6 +304,15 @@ export const apiService = {
       cleanCode = 'BIO-' + cleanCode.substring(0, 4) + '-' + cleanCode.substring(4);
     }
 
+    // Local check first: has this code already been redeemed on this browser?
+    if (isCodeUsedLocally(cleanCode)) {
+      return {
+        success: false,
+        error_code: 'ALREADY_USED',
+        message: 'Access Code ini sudah digunakan oleh pengunjung lain.'
+      };
+    }
+
     try {
       const res = await fetch('/api/verify-code', {
         method: 'POST',
@@ -304,27 +322,44 @@ export const apiService = {
       const data = await res.json();
 
       if (res.ok && data.success && data.session_token) {
+        // Save ephemeral in-memory session (lasts while student is on the site)
         sessionManager.saveSession(data.session_token, {
           section: data.section,
           expires_at: data.expires_at,
           claimed_at: new Date().toISOString()
         });
 
-        // Mark as used in local cache so same device knows immediately
+        // Mark permanently as USED in local cache and used_codes registry
+        recordUsedCodeLocally(cleanCode);
+
         const codes = getOfflineCodes();
         const target = codes.find(c => c.code.toUpperCase() === cleanCode);
         if (target) {
           target.is_used = true;
           target.used_at = new Date().toISOString();
           saveOfflineCodes(codes);
+        } else {
+          codes.unshift({
+            id: 'used-' + Date.now(),
+            code: cleanCode,
+            section: data.section,
+            is_used: true,
+            used_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            expires_at: data.expires_at,
+            access_type: 'one_time'
+          });
+          saveOfflineCodes(codes);
         }
-        recordUsedCodeLocally(cleanCode);
 
         return data;
       }
 
-      // If server returned 400 (ALREADY_USED or EXPIRED), honor it immediately
+      // If server returned 400 (ALREADY_USED or EXPIRED)
       if (res.status === 400) {
+        if (data.error_code === 'ALREADY_USED') {
+          recordUsedCodeLocally(cleanCode);
+        }
         return data;
       }
 
@@ -350,15 +385,17 @@ export const apiService = {
   async validateSession(token, requiredSection) {
     if (!token) return { valid: false, reason: 'NO_TOKEN' };
 
+    // Check in-memory session first
+    const sessions = sessionManager.getAllSessions();
+    const s = sessions[token];
+    if (!s) return { valid: false, reason: 'SESSION_NOT_FOUND' };
+    if (s.expires_at && new Date(s.expires_at) <= new Date()) return { valid: false, reason: 'SESSION_EXPIRED' };
+    if (requiredSection && s.section !== 'all' && s.section !== requiredSection) {
+      return { valid: false, reason: 'PERMISSION_DENIED', allowed_section: s.section };
+    }
+
     // If local session token, validate locally
     if (token.startsWith('ses_local_')) {
-      const sessions = sessionManager.getAllSessions();
-      const s = sessions[token];
-      if (!s) return { valid: false, reason: 'SESSION_NOT_FOUND' };
-      if (s.expires_at && new Date(s.expires_at) <= new Date()) return { valid: false, reason: 'SESSION_EXPIRED' };
-      if (requiredSection && s.section !== 'all' && s.section !== requiredSection) {
-        return { valid: false, reason: 'PERMISSION_DENIED', allowed_section: s.section };
-      }
       return { valid: true, section: s.section, expires_at: s.expires_at };
     }
 
@@ -370,13 +407,6 @@ export const apiService = {
       });
       return await res.json();
     } catch (err) {
-      const sessions = sessionManager.getAllSessions();
-      const s = sessions[token];
-      if (!s) return { valid: false, reason: 'SESSION_NOT_FOUND' };
-      if (s.expires_at && new Date(s.expires_at) <= new Date()) return { valid: false, reason: 'SESSION_EXPIRED' };
-      if (requiredSection && s.section !== 'all' && s.section !== requiredSection) {
-        return { valid: false, reason: 'PERMISSION_DENIED', allowed_section: s.section };
-      }
       return { valid: true, section: s.section, expires_at: s.expires_at };
     }
   },
@@ -445,15 +475,42 @@ export const apiService = {
 
     // Merge server codes with local codes (deduplicated by normalized code)
     const localCodes = getOfflineCodes();
+    const locallyUsedList = getUsedCodesLocally().map(c => c.toUpperCase());
+    const locallyUsedSet = new Set(locallyUsedList);
+
     const map = new Map();
+
+    // 1. Put local codes in map
     for (const c of localCodes) {
-      map.set(c.code.toUpperCase(), c);
-    }
-    for (const c of serverCodes) {
-      map.set(c.code.toUpperCase(), c);
+      const codeUpper = (c.code || '').toUpperCase();
+      const isUsed = Boolean(c.is_used || locallyUsedSet.has(codeUpper));
+      map.set(codeUpper, {
+        ...c,
+        is_used: isUsed,
+        used_at: c.used_at || (isUsed ? (c.used_at || new Date().toISOString()) : null)
+      });
     }
 
-    let list = Array.from(map.values());
+    // 2. Merge server codes without ever regressing is_used from true to false
+    for (const c of serverCodes) {
+      const codeUpper = (c.code || '').toUpperCase();
+      const existing = map.get(codeUpper);
+      const isUsed = Boolean(c.is_used || existing?.is_used || locallyUsedSet.has(codeUpper));
+      const usedAt = (c.is_used && c.used_at) || existing?.used_at || (isUsed ? new Date().toISOString() : null);
+
+      map.set(codeUpper, {
+        ...(existing || {}),
+        ...c,
+        is_used: isUsed,
+        used_at: usedAt
+      });
+    }
+
+    // Keep local cache permanently updated
+    const mergedList = Array.from(map.values());
+    saveOfflineCodes(mergedList);
+
+    let list = mergedList;
 
     if (search) {
       const q = search.toUpperCase();
@@ -475,11 +532,11 @@ export const apiService = {
   },
 
   async getDashboardStats() {
-    let stats = null;
+    let serverStats = null;
     try {
       const res = await fetch('/api/stats');
       if (res.ok) {
-        stats = await res.json();
+        serverStats = await res.json();
       }
     } catch {
       // ignore
@@ -492,10 +549,10 @@ export const apiService = {
     const unused = codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length;
 
     return {
-      total: Math.max(total, stats?.total || 0),
-      used: Math.max(used, stats?.used || 0),
-      unused: Math.max(unused, stats?.unused || 0),
-      activeSessions: stats?.activeSessions || 1
+      total: Math.max(total, serverStats?.total || 0),
+      used: Math.max(used, serverStats?.used || 0),
+      unused: unused,
+      activeSessions: serverStats?.activeSessions || (used > 0 ? 1 : 0)
     };
   }
 };
