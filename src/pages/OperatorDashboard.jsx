@@ -18,7 +18,8 @@ import {
   ArrowRight,
   Code,
   Lock,
-  ShoppingBag
+  ShoppingBag,
+  Trash2
 } from 'lucide-react';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
@@ -125,6 +126,40 @@ export default function OperatorDashboard() {
     navigator.clipboard.writeText(generatedCodeResult.code);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleClearAllCodes = async () => {
+    const confirmed = window.confirm(
+      'Apakah Anda yakin ingin MENGHAPUS SEMUA KODE AKSES di log?\n\nSemua riwayat kode, sesi, dan statistik akan direset kembali ke 0 secara bersih.'
+    );
+    if (!confirmed) return;
+
+    setIsLoading(true);
+    try {
+      await apiService.clearAllCodes();
+      setCodes([]);
+      setStats({ total: 0, unused: 0, used: 0, activeSessions: 0 });
+      setGeneratedCodeResult(null);
+      await loadDashboardData();
+    } catch (err) {
+      console.error('Failed to clear codes:', err);
+      alert('Gagal membersihkan riwayat kode.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteSingleCode = async (code) => {
+    const confirmed = window.confirm(`Hapus kode akses ${code} dari log riwayat?`);
+    if (!confirmed) return;
+
+    try {
+      await apiService.deleteSingleCode(code);
+      await loadDashboardData();
+    } catch (err) {
+      console.error('Failed to delete code:', err);
+      alert('Gagal menghapus kode akses.');
+    }
   };
 
   const formatDate = (isoString) => {
@@ -546,6 +581,32 @@ export default function OperatorDashboard() {
                 <option value="menu-4-vessels">Menu 4 (Pipa Pembuluh)</option>
                 <option value="menu-5-drinks">Menu 5 (Es Sirkulasi)</option>
               </select>
+
+              {/* Trashbin Clear All Button */}
+              <button
+                type="button"
+                onClick={handleClearAllCodes}
+                disabled={isLoading || (codes.length === 0 && stats.total === 0)}
+                className="btn-secondary"
+                style={{
+                  height: '38px',
+                  padding: '0 14px',
+                  fontSize: '13px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: (codes.length === 0 && stats.total === 0) ? '#94A3B8' : '#DC2626',
+                  borderColor: (codes.length === 0 && stats.total === 0) ? 'var(--color-border)' : '#FECACA',
+                  backgroundColor: (codes.length === 0 && stats.total === 0) ? '#F8FAFC' : '#FEF2F2',
+                  cursor: (codes.length === 0 && stats.total === 0) ? 'not-allowed' : 'pointer',
+                  fontWeight: 600,
+                  transition: 'all 0.15s ease'
+                }}
+                title="Hapus semua log kode dan reset seluruh statistik kembali ke 0"
+              >
+                <Trash2 size={14} />
+                <span>Bersihkan Log (0)</span>
+              </button>
             </div>
           </div>
 
@@ -556,12 +617,12 @@ export default function OperatorDashboard() {
                 Belum ada access code
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--color-secondary-text)', marginBottom: '16px' }}>
-                Gunakan form generator di atas untuk menerbitkan kode baru.
+                Log bersih (0 kode). Gunakan form generator di atas untuk menerbitkan kode baru.
               </p>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '760px' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--color-border)', backgroundColor: '#F8FAFC' }}>
                     <th style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700, color: 'var(--color-dark)' }}>Code</th>
@@ -569,6 +630,7 @@ export default function OperatorDashboard() {
                     <th style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700, color: 'var(--color-dark)' }}>Status</th>
                     <th style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700, color: 'var(--color-dark)' }}>Dibuat</th>
                     <th style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700, color: 'var(--color-dark)' }}>Digunakan Pada</th>
+                    <th style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700, color: 'var(--color-dark)', textAlign: 'center' }}>Hapus</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -598,6 +660,29 @@ export default function OperatorDashboard() {
                         </td>
                         <td style={{ padding: '12px 16px', fontSize: '13px', color: item.used_at ? 'var(--color-dark)' : '#94A3B8' }}>
                           {formatDate(item.used_at)}
+                        </td>
+                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSingleCode(item.code)}
+                            className="btn-secondary"
+                            style={{
+                              padding: '6px 10px',
+                              height: 'auto',
+                              fontSize: '12px',
+                              color: '#DC2626',
+                              borderColor: '#FECACA',
+                              backgroundColor: '#FEF2F2',
+                              borderRadius: '8px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                            title={`Hapus kode ${item.code} dari riwayat`}
+                          >
+                            <Trash2 size={13} />
+                          </button>
                         </td>
                       </tr>
                     );

@@ -531,6 +531,57 @@ export const apiService = {
     return list;
   },
 
+  async clearAllCodes() {
+    // 1. Clear local storage offline codes and used codes
+    localStorage.removeItem(OFFLINE_CODES_KEY);
+    localStorage.removeItem(USED_CODES_KEY);
+    sessionManager.clearAllSessions();
+
+    // 2. Call server endpoint to clear server database
+    try {
+      await fetch('/api/clear-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'clear' })
+      });
+    } catch (err) {
+      console.warn('Failed calling /api/clear-codes:', err);
+    }
+
+    try {
+      await fetch('/api/codes?clearAll=true', {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      console.warn('Failed calling DELETE /api/codes:', err);
+    }
+
+    return { success: true };
+  },
+
+  async deleteSingleCode(codeToDelete) {
+    if (!codeToDelete) return { success: false };
+    const norm = codeToDelete.trim().toUpperCase();
+
+    // 1. Remove from local caches
+    const codes = getOfflineCodes().filter(c => (c.code || '').toUpperCase() !== norm);
+    saveOfflineCodes(codes);
+
+    const used = getUsedCodesLocally().filter(c => c.toUpperCase() !== norm);
+    localStorage.setItem(USED_CODES_KEY, JSON.stringify(used));
+
+    // 2. Call server to delete
+    try {
+      await fetch(`/api/codes?code=${encodeURIComponent(norm)}`, {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      console.warn('Failed deleting single code on server:', err);
+    }
+
+    return { success: true };
+  },
+
   async getDashboardStats() {
     let serverStats = null;
     try {
@@ -547,6 +598,10 @@ export const apiService = {
     const total = codes.length;
     const used = codes.filter(c => c.is_used).length;
     const unused = codes.filter(c => !c.is_used && (!c.expires_at || new Date(c.expires_at) > now)).length;
+
+    if (total === 0 && (!serverStats || serverStats.total === 0)) {
+      return { total: 0, used: 0, unused: 0, activeSessions: 0 };
+    }
 
     return {
       total: Math.max(total, serverStats?.total || 0),
